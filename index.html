@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SONIC – Ferretería</title>
+<style>
+:root{--az:#0b2a5b;--na:#f26a1b;--fo:#f4f6fa;--tx:#14213d}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.4 system-ui,sans-serif;background:var(--fo);color:var(--tx)}
+button,input{font:inherit}
+button{min-height:48px;border:0;border-radius:12px;padding:0 16px;background:#e3e8f2;color:var(--tx);cursor:pointer;font-weight:600}
+input{min-height:48px;border:2px solid #c5cde0;border-radius:12px;padding:0 12px;width:100%;margin-top:6px}
+:focus-visible{outline:3px solid var(--na);outline-offset:2px}
+.pri{background:var(--na);color:#fff}.az{background:var(--az);color:#fff}
+header{position:sticky;top:0;z-index:5;background:var(--az);padding:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.logo{color:#fff;font-weight:800;font-size:22px}
+#bw{position:relative;flex:1;min-width:230px;display:flex;gap:6px}
+#q{flex:1;min-height:52px;border:0;font-size:18px;margin:0}
+#sug{position:absolute;top:58px;left:0;right:0;background:#fff;border-radius:12px;box-shadow:0 8px 24px #0005;max-height:70vh;overflow:auto;display:none}
+.si{display:flex;gap:10px;align-items:center;width:100%;border-radius:0;background:#fff;text-align:left;min-height:56px}
+main{padding:12px;max-width:1300px;margin:auto}
+h2{margin:14px 0 8px}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.cat{height:110px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:17px;box-shadow:0 1px 4px #0002}
+.cat b{font-size:40px}
+.row{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px}
+.mini{flex:0 0 190px;background:#fff;text-align:left;height:auto;padding:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;align-items:center}
+.chip.on{background:var(--az);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.v .grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr))}
+.card{background:#fff;border-radius:14px;padding:12px;box-shadow:0 1px 4px #0002;display:flex;flex-direction:column;gap:6px}
+.card .t{background:none;text-align:left;height:auto;padding:0;font-size:17px}
+.img{font-size:54px;text-align:center}
+.pr{font-size:22px;font-weight:800;color:var(--az)}
+.st{font-size:14px;font-weight:700;padding:2px 8px;border-radius:99px;align-self:flex-start}
+.ok{background:#d6f5df;color:#0a6b2b}.lo{background:#fff1b8;color:#7a5a00}.no{background:#ffd9d9;color:#a00}
+.q{display:flex;gap:6px;align-items:center}.q button{width:48px;padding:0}
+.q .n{flex:1;width:auto;font-size:20px;background:#eef1f7}
+.sm{font-size:14px;color:#52607e}
+#ov{position:fixed;inset:0;background:#0007;display:none;z-index:20;align-items:center;justify-content:center;padding:10px}
+#ov.on{display:flex}
+.box{background:#fff;border-radius:16px;padding:16px;max-width:560px;width:100%;max-height:92vh;overflow:auto}
+#cart{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:#fff;z-index:15;transform:translateX(100%);transition:transform .2s;padding:14px;overflow:auto;box-shadow:-6px 0 20px #0004}
+#cart.on{transform:none}
+.ln{display:grid;grid-template-columns:1fr auto;gap:6px;border-bottom:1px solid #dde;padding:8px 0}
+.ln .q{grid-column:1/3}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pad button{min-height:64px;font-size:26px}
+footer{text-align:center;padding:20px;color:#52607e}
+/* ---- Proforma (vista previa e impresión) ---- */
+.pf{background:#fff;color:#000;font-family:"Courier New",monospace;font-size:12px;line-height:1.3}
+.pf hr{border:0;border-top:1px dashed #000;margin:6px 0}
+.pf .c{text-align:center;margin-bottom:6px}
+.pf .r{display:flex;justify-content:space-between;gap:6px}
+.pf .tot{font-size:16px;font-weight:700}
+.pf.t80{width:72mm}.pf.t58{width:48mm;font-size:11px}
+.pf.a4{font-family:system-ui,sans-serif;font-size:14px;width:100%;max-width:190mm;margin:auto}
+.pf.a4 table{width:100%;border-collapse:collapse}.pf.a4 th,.pf.a4 td{border-bottom:1px solid #999;padding:6px;text-align:left}
+.pf.a4 th:nth-child(n+3),.pf.a4 td:nth-child(n+3){text-align:right}
+.pfw{background:#ddd;padding:10px;display:flex;justify-content:center;overflow:auto}.pfw .pf{padding:8px;box-shadow:0 0 6px #0004}
+#pf{display:none}
+textarea{width:100%;min-height:72px;border:2px solid #c5cde0;border-radius:12px;padding:8px;margin-top:6px;font:inherit}
+label{display:block;margin-top:10px;font-weight:600}
+.pf .lg{max-width:40mm;max-height:18mm}.pf .lg.a{max-width:60mm;max-height:25mm}
+.pf .sm{color:#000;font-size:.9em}
+@media print{body>*:not(#pf){display:none!important}#pf{display:block!important}}
+</style>
+<style id="pg"></style>
+</head>
+<body>
+<header>
+  <span class="logo" id="logo"></span>
+  <button data-a="home" aria-label="Inicio">🏠 Inicio</button>
+  <div id="bw">
+    <input id="q" type="search" placeholder="Buscar: cable 12, cemento, silicona…" aria-label="Buscar productos" autocomplete="off">
+    <button id="mic" class="pri" aria-label="Dictar por voz">🎤</button>
+    <div id="sug"></div>
+  </div>
+  <button id="nueva" data-a="nueva" class="pri" style="display:none">🆕 Nueva atención</button>
+  <button id="panel" data-a="panel" class="az" style="display:none;border:2px solid #fff">🎛 Panel</button>
+  <button id="balb" data-a="bal" class="az" style="display:none;border:2px solid #fff">📦 Balance</button>
+  <button id="modo" data-a="modo"></button>
+  <button id="cbtn" data-a="cart" class="pri"></button>
+</header>
+<main id="main"></main>
+<footer id="foot"></footer>
+<aside id="cart" aria-label="Carrito"></aside>
+<div id="ov"></div>
+<div id="pf"></div>
+<input type="file" id="file" accept=".csv" hidden>
+<input type="file" id="file2" accept=".json" hidden>
+<input type="file" id="flogo" accept="image/*" hidden>
+
+<script>
+/* =====================================================
+   1. DATOS DEL NEGOCIO (edita aquí)
+   ===================================================== */
+const NEGOCIO={nombre:"SONIC",whatsapp:"51971814963",direccion:"Chincha - Ica, Perú",horario:"7:00 am – 6:00 pm",nota:"Proforma válida por 3 días. No es comprobante de pago.",ruc:"",cuentas:"",logo:"",
+  notaNV:"Gracias por su compra. Este documento no es comprobante de pago electrónico; solicite su boleta o factura.",
+  notaFiscal:"Documento de control interno. Emitir el comprobante electrónico en un sistema autorizado por SUNAT.",
+  waNombre:"Ventas",otros:[],wsAlmacen:"",   // WhatsApp principal (nombre), hasta 2 WhatsApp extra y WhatsApp de almacén
+  sucursal:"Principal",pv:"001"};      // sucursal y código de ESTE equipo (distinto en cada tablet: 001, 002, 003…)
+// true = solo tienda online para clientes (oculta el modo vendedor). También se activa abriendo la página con ?tienda al final de la dirección
+const MODO_PUBLICO=false||/[?&]tienda/.test(location.search);
+// Lo que guardes con "Personalizar recibo" se guarda en el navegador y reemplaza estos valores
+try{Object.assign(NEGOCIO,JSON.parse(localStorage.getItem("sonic_cfg"))||{})}catch(e){}
+
+// Categorías con su icono (emoji). Las categorías nuevas que aparezcan en los productos o en el CSV se muestran solas (usan el emoji "imagen" del primer producto)
+const CATS={"Construcción":"🧱","Pintura":"🎨","Electricidad":"💡","Herramientas":"🔨","Gasfitería":"🚰","Baño y Cocina":"🚿","Ferretería":"🔩","Tanques":"🛢️","Limpieza":"🧹","Seguridad":"🦺","Aditivos":"🧪"};
+const FREC=["cemento","cable 12","pintura blanca","tubo pvc","silicona","foco led"];
+
+/* =====================================================
+   2. PRODUCTOS (edita o agrega líneas; o usa "Importar CSV")
+   Campos: nombre, categoria, subcategoria, marca, presentacion, precio (obligatorios)
+   Opcionales (si faltan se calculan): id, sku, precioMayorista (90% del precio),
+   cantidadMayorista (10), stock (20), imagen (emoji de la categoría), alias[], masVendido
+   ===================================================== */
+const BASE=[
+{nombre:"Cemento Sol Tipo I",categoria:"Construcción",subcategoria:"Cemento",marca:"Sol",presentacion:"Bolsa 42.5 kg",precio:29.5,precioMayorista:28,cantidadMayorista:20,masVendido:true},
+{nombre:"Cemento Andino Tipo I",categoria:"Construcción",subcategoria:"Cemento",marca:"Andino",presentacion:"Bolsa 42.5 kg",precio:28.9,precioMayorista:27.5,cantidadMayorista:20,stock:4},
+{nombre:"Fierro corrugado 1/2\"",categoria:"Construcción",subcategoria:"Fierro",marca:"Aceros Arequipa",presentacion:"Varilla 9 m",precio:49,alias:["varilla","acero"],masVendido:true},
+{nombre:"Fierro corrugado 3/8\"",categoria:"Construcción",subcategoria:"Fierro",marca:"Aceros Arequipa",presentacion:"Varilla 9 m",precio:27,alias:["varilla","acero"]},
+{nombre:"Alambre negro N°16",categoria:"Construcción",subcategoria:"Fierro",marca:"Prodac",presentacion:"Kg",precio:7.5},
+{nombre:"Ladrillo King Kong 18 huecos",categoria:"Construcción",subcategoria:"Ladrillos",marca:"Lark",presentacion:"Unidad",precio:1.1,precioMayorista:0.95,cantidadMayorista:500},
+{nombre:"Arena gruesa",categoria:"Construcción",subcategoria:"Agregados",marca:"Cantera",presentacion:"Saco",precio:6,cantidadMayorista:30},
+{nombre:"Piedra chancada 1/2\"",categoria:"Construcción",subcategoria:"Agregados",marca:"Cantera",presentacion:"Saco",precio:7,cantidadMayorista:30,masVendido:true},
+{nombre:"Látex Vencedor Blanco",categoria:"Pintura",subcategoria:"Látex",marca:"Vencedor",presentacion:"Galón",precio:49,masVendido:true},
+{nombre:"Látex Vencedor Blanco",categoria:"Pintura",subcategoria:"Látex",marca:"Vencedor",presentacion:"Balde 5 gal",precio:215,cantidadMayorista:3},
+{nombre:"Esmalte sintético Blanco",categoria:"Pintura",subcategoria:"Esmaltes",marca:"Tekno",presentacion:"1/4 galón",precio:28},
+{nombre:"Thinner acrílico",categoria:"Pintura",subcategoria:"Solventes",marca:"Tekno",presentacion:"Litro",precio:11},
+{nombre:"Brocha 3\"",categoria:"Pintura",subcategoria:"Accesorios",marca:"Tumi",presentacion:"Unidad",precio:8},
+{nombre:"Rodillo 9\" con mango",categoria:"Pintura",subcategoria:"Accesorios",marca:"Tumi",presentacion:"Unidad",precio:14},
+{nombre:"Cable THW 12 AWG",categoria:"Electricidad",subcategoria:"Cables",marca:"Indeco",presentacion:"Rollo 100 m",precio:185,cantidadMayorista:3,alias:["alambre"],masVendido:true},
+{nombre:"Cable THW 14 AWG",categoria:"Electricidad",subcategoria:"Cables",marca:"Indeco",presentacion:"Rollo 100 m",precio:120,cantidadMayorista:3,alias:["alambre"]},
+{nombre:"Cable THW 10 AWG",categoria:"Electricidad",subcategoria:"Cables",marca:"Indeco",presentacion:"Rollo 100 m",precio:290,cantidadMayorista:3},
+{nombre:"Cable THW 12 AWG",categoria:"Electricidad",subcategoria:"Cables",marca:"Celsa",presentacion:"Rollo 100 m",precio:172,cantidadMayorista:3},
+{nombre:"Interruptor simple",categoria:"Electricidad",subcategoria:"Interruptores",marca:"Bticino",presentacion:"Unidad",precio:9.5,alias:["llave de luz"]},
+{nombre:"Tomacorriente doble",categoria:"Electricidad",subcategoria:"Interruptores",marca:"Bticino",presentacion:"Unidad",precio:12,alias:["enchufe"]},
+{nombre:"Foco LED 9W",categoria:"Electricidad",subcategoria:"Iluminación",marca:"Philips",presentacion:"Unidad",precio:6,alias:["lámpara","bombilla"],masVendido:true},
+{nombre:"Cinta aislante",categoria:"Electricidad",subcategoria:"Accesorios",marca:"3M",presentacion:"Rollo",precio:4.5,alias:["taipe"]},
+{nombre:"Martillo 16 oz",categoria:"Herramientas",subcategoria:"Manuales",marca:"Stanley",presentacion:"Unidad",precio:32},
+{nombre:"Alicate universal 8\"",categoria:"Herramientas",subcategoria:"Manuales",marca:"Stanley",presentacion:"Unidad",precio:28},
+{nombre:"Destornillador Phillips",categoria:"Herramientas",subcategoria:"Manuales",marca:"Stanley",presentacion:"Unidad",precio:9,alias:["desarmador"]},
+{nombre:"Flexómetro 5 m",categoria:"Herramientas",subcategoria:"Medición",marca:"Stanley",presentacion:"Unidad",precio:22,alias:["wincha"]},
+{nombre:"Taladro percutor 13 mm",categoria:"Herramientas",subcategoria:"Eléctricas",marca:"Bosch",presentacion:"Unidad",precio:289,stock:3},
+{nombre:"Disco de corte 4 1/2\"",categoria:"Herramientas",subcategoria:"Eléctricas",marca:"Bosch",presentacion:"Unidad",precio:5},
+{nombre:"Tubo PVC desagüe 4\"",categoria:"Gasfitería",subcategoria:"Tuberías",marca:"Pavco",presentacion:"Tubo 3 m",precio:22,alias:["tubería"],masVendido:true},
+{nombre:"Tubo PVC agua 1/2\" C-10",categoria:"Gasfitería",subcategoria:"Tuberías",marca:"Pavco",presentacion:"Tubo 5 m",precio:12,alias:["tubería"]},
+{nombre:"Codo PVC 1/2\"",categoria:"Gasfitería",subcategoria:"Accesorios",marca:"Pavco",presentacion:"Unidad",precio:1},
+{nombre:"Pegamento para PVC",categoria:"Gasfitería",subcategoria:"Accesorios",marca:"Oatey",presentacion:"1/8 galón",precio:8,alias:["cola"]},
+{nombre:"Cinta teflón",categoria:"Gasfitería",subcategoria:"Accesorios",marca:"Truper",presentacion:"Rollo",precio:1.5},
+{nombre:"Llave de paso 1/2\"",categoria:"Gasfitería",subcategoria:"Llaves",marca:"Nibco",presentacion:"Unidad",precio:15},
+{nombre:"Inodoro One Piece",categoria:"Baño y Cocina",subcategoria:"Sanitarios",marca:"Trébol",presentacion:"Unidad",precio:289,alias:["wc","taza"]},
+{nombre:"Lavatorio con pedestal",categoria:"Baño y Cocina",subcategoria:"Sanitarios",marca:"Trébol",presentacion:"Unidad",precio:120},
+{nombre:"Grifo para lavadero",categoria:"Baño y Cocina",subcategoria:"Grifería",marca:"Vainsa",presentacion:"Unidad",precio:38,alias:["caño"]},
+{nombre:"Tanque Rotoplas 1100 L",categoria:"Tanques",subcategoria:"Agua",marca:"Rotoplas",presentacion:"1100 L",precio:389,stock:2},
+{nombre:"Tanque Rotoplas 600 L",categoria:"Tanques",subcategoria:"Agua",marca:"Rotoplas",presentacion:"600 L",precio:245},
+{nombre:"Lejía Clorox",categoria:"Limpieza",subcategoria:"Desinfección",marca:"Clorox",presentacion:"1 litro",precio:4.5,alias:["cloro"]},
+{nombre:"Detergente Ariel",categoria:"Limpieza",subcategoria:"Detergentes",marca:"Ariel",presentacion:"800 g",precio:12},
+{nombre:"Escoba de plástico",categoria:"Limpieza",subcategoria:"Utensilios",marca:"Tumi",presentacion:"Unidad",precio:12},
+{nombre:"Casco de seguridad",categoria:"Seguridad",subcategoria:"Protección",marca:"3M",presentacion:"Unidad",precio:15},
+{nombre:"Guantes de cuero",categoria:"Seguridad",subcategoria:"Protección",marca:"Truper",presentacion:"Par",precio:8},
+{nombre:"Lentes de seguridad",categoria:"Seguridad",subcategoria:"Protección",marca:"3M",presentacion:"Unidad",precio:6,stock:0},
+{nombre:"Clavos 3\"",categoria:"Ferretería",subcategoria:"Fijación",marca:"Prodac",presentacion:"Kg",precio:6.5},
+{nombre:"Tornillo drywall 1\"",categoria:"Ferretería",subcategoria:"Fijación",marca:"Fischer",presentacion:"Caja 100 u",precio:9},
+{nombre:"Candado 40 mm",categoria:"Ferretería",subcategoria:"Cerraduras",marca:"Forte",presentacion:"Unidad",precio:18},
+{nombre:"Sikaflex 11 FC",categoria:"Aditivos",subcategoria:"Sellantes",marca:"Sika",presentacion:"Cartucho 300 ml",precio:35,alias:["silicona","sellador"],masVendido:true},
+{nombre:"Sika 1 impermeabilizante",categoria:"Aditivos",subcategoria:"Impermeabilizantes",marca:"Sika",presentacion:"Balde 4 kg",precio:38,alias:["aditivo"]},
+{nombre:"Sikaflex Silicona",categoria:"Aditivos",subcategoria:"Sellantes",marca:"Sika",presentacion:"Cartucho 280 ml",precio:18,alias:["silicón"]}
+];
+
+/* =====================================================
+   3. UTILIDADES, ESTADO Y GUARDADO (localStorage)
+   ===================================================== */
+const $=s=>document.querySelector(s);
+const E=encodeURIComponent, D=decodeURIComponent;
+const money=n=>"S/ "+Number(n).toFixed(2);
+const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const LS=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch(e){return d}};
+let S=Object.assign({modo:"cliente",cart:{},rec:[],tipo:"publico",cli:{nombre:"",tel:""},fmt:"80",nro:1,hist:[],neg:{}},LS("sonic",{}));
+let HIST=LS("sonic_pf",null)||S.hist||[];   // todas las proformas guardadas
+const savePF=()=>{try{localStorage.setItem("sonic_pf",JSON.stringify(HIST))}catch(e){alert("⚠ Almacenamiento lleno: exporta un respaldo de tus proformas.")}};
+try{if(!localStorage.getItem("sonic_pf"))savePF()}catch(e){}
+// ---- Vendedores registrados y sesión (la sesión se cierra al cerrar la pestaña o con "Cerrar sesión") ----
+let VEND=LS("sonic_vend",[]);
+const saveV=()=>{try{localStorage.setItem("sonic_vend",JSON.stringify(VEND))}catch(e){alert("No se pudo guardar el registro de vendedores.")}};
+let REG=Object.assign({mayoristaPct:50,monto:500,extra:5},LS("sonic_reglas",{}));   // reglas de descuento (las edita el administrador)
+let SES=null;try{SES=sessionStorage.getItem("sonic_ses")}catch(e){}
+const USR=()=>VEND.find(v=>v.id===SES);
+const esAdmin=()=>!!USR()&&USR().rol==="admin";
+if(MODO_PUBLICO||(S.modo==="vendedor"&&!USR()))S.modo="cliente";   // para atender como vendedor hay que iniciar sesión
+async function hsh(t){try{const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode("sonic|"+t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}catch(e){let h=5381;for(const c of "sonic|"+t)h=((h<<5)+h+c.charCodeAt(0))|0;return"f"+h}}
+if(!S.cnt)S.cnt={NV:1,PF:S.nro||1,BV:1,FA:1};   // correlativos: Nota de venta, Proforma, Boleta, Factura
+S.tmp={};S.nav={cat:null,sub:null,f:{},q:""};S.ent="retiro";S.dir="";
+const save=()=>{try{localStorage.setItem("sonic",JSON.stringify({modo:S.modo,cart:S.cart,rec:S.rec,tipo:S.tipo,cli:S.cli,fmt:S.fmt,nro:S.nro,neg:S.neg,cnt:S.cnt}))}catch(e){}};
+
+// Completa los campos que falten y prepara las palabras para buscar
+function prep(a){return a.map((p,i)=>{p=Object.assign({},p);p.id=p.id||i+1;p.sku=p.sku||"SK"+String(p.id).padStart(4,"0");
+p.precioMayorista=p.precioMayorista||+(p.precio*0.9).toFixed(2);p.cantidadMayorista=p.cantidadMayorista||10;
+p.stock=ST[p.sku]??p.stock??20;p.alias=p.alias||[];p.imagen=p.imagen||CATS[p.categoria]||"📦";p.subcategoria=p.subcategoria||"Otros";
+p._w=norm([p.nombre,p.marca,p.categoria,p.subcategoria,p.sku,p.presentacion,...p.alias].join(" ")).split(/[^a-z0-9]+/).filter(Boolean);return p})}
+const ST=LS("sonic_stock",{});   // stock descontado por ventas (clave: sku)
+let RAW=LS("catalogo",null)||BASE;
+let PROD=prep(RAW);
+const prod=id=>PROD.find(p=>p.id==id);
+
+/* =====================================================
+   4. PRECIOS
+   Público: precio normal, y precio por volumen desde cantidadMayorista.
+   Mayorista (solo modo vendedor): siempre precioMayorista.
+   ===================================================== */
+const tipo=()=>S.modo==="vendedor"?S.tipo:"publico";
+const pu=(p,q)=>(tipo()==="mayorista"||q>=p.cantidadMayorista)?p.precioMayorista:p.precio;
+
+/* =====================================================
+   5. BÚSQUEDA INTELIGENTE (sin tildes, tolera errores, palabras en cualquier orden)
+   ===================================================== */
+function lev(a,b){const d=[];for(let i=0;i<=a.length;i++)d[i]=[i];for(let j=1;j<=b.length;j++)d[0][j]=j;
+for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length]}
+function buscar(q){
+  const t=norm(q).split(/\s+/).filter(Boolean);if(!t.length)return[];
+  return PROD.map(p=>{let s=0;
+    for(const k of t){const w=p._w;
+      if(w.includes(k))s+=3;
+      else if(w.some(x=>x.includes(k)))s+=2;
+      else if(k.length>=4&&w.some(x=>lev(k,x.slice(0,k.length+1))<=(k.length>=7?2:1)))s+=1;
+      else return null}            // todas las palabras deben coincidir
+    return{p,s}}).filter(Boolean).sort((a,b)=>b.s-a.s).map(r=>r.p);
+}
+function sug(){
+  const v=$("#q").value.trim();let h="";
+  if(v.length>=2){const r=buscar(v);
+    if(r.length){h=r.slice(0,6).map(p=>`<button class="si" data-a="open" data-v="${p.id}"><span style="font-size:30px">${p.imagen}</span><span style="flex:1">${p.nombre}<br><span class="sm">${p.marca} · ${p.presentacion}</span></span><b>${money(pu(p,1))}</b></button>`).join("")+`<button class="si az" data-a="all">Ver los ${r.length} resultados</button>`}
+    else h=`<div style="padding:14px">😕 No encontramos "${esc(v)}". Prueba con otra palabra.<br><br><button class="pri" data-a="wa0">💬 Consultar por WhatsApp</button></div>`}
+  h+=`<div style="padding:10px"><b>Búsquedas frecuentes</b><div class="chips">${FREC.map(f=>`<button class="chip" data-a="fq" data-v="${E(f)}">${f}</button>`).join("")}</div></div>`;
+  $("#sug").innerHTML=h;$("#sug").style.display="block"}
+
+/* =====================================================
+   6. CARRITO
+   ===================================================== */
+// pl = precio de lista; pr = precio final (si el vendedor negoció, es el precio acordado)
+const items=()=>Object.entries(S.cart).map(([id,q])=>{const p=prod(id);if(!p)return null;const pl=pu(p,q),n=S.modo==="vendedor"?S.neg[id]:null;return{p,q,pl,pr:n!=null?Math.min(n,pl):pl}}).filter(Boolean);
+const total=()=>items().reduce((s,x)=>s+x.pr*x.q,0);
+const cant=()=>Object.values(S.cart).reduce((a,b)=>a+b,0);
+function texto(){
+  const V=S.modo==="vendedor";
+  let t=`*${V?"Cotización":"Pedido"} - ${NEGOCIO.nombre}*\n`;
+  if(V&&S.cli.nombre)t+=`Cliente: ${S.cli.nombre}\n`;
+  if(!V)t+=`Entrega: ${S.ent==="retiro"?"Retiro en tienda ("+NEGOCIO.direccion+")":"Despacho a domicilio: "+S.dir}\n`;
+  t+="\n"+items().map(x=>`• ${x.q} x ${x.p.nombre} (${x.p.presentacion}) – ${money(x.pr*x.q)}`).join("\n")+`\n\n*TOTAL: ${money(total())}*`;
+  return t}
+function waNum(){const d=(S.cli.tel||"").replace(/\D/g,"");return S.modo==="vendedor"&&d.length>=9?(d.length===9?"51"+d:d):NEGOCIO.whatsapp}
+const wa=(num,txt)=>window.open("https://wa.me/"+num+"?text="+E(txt),"_blank");
+
+/* =====================================================
+   7. PANTALLAS
+   ===================================================== */
+const stock=p=>p.stock<=0?`<span class="st no">Agotado</span>`:p.stock<=5?`<span class="st lo">Pocas unidades</span>`:`<span class="st ok">Disponible</span>`;
+const chip=(l,a,v,on)=>`<button class="chip${on?" on":""}" data-a="${a}" data-v="${E(v)}">${l}</button>`;
+const mini=p=>`<button class="mini" data-a="open" data-v="${p.id}"><span style="font-size:34px">${p.imagen}</span><br>${p.nombre}<br><b class="pr" style="font-size:18px">${money(pu(p,1))}</b></button>`;
+
+function card(p){const q=S.tmp[p.id]||1;
+  return `<div class="card"><button class="t" data-a="open" data-v="${p.id}"><div class="img">${p.imagen}</div><span class="sm">${p.categoria}</span><br><b>${p.nombre}</b><br><span class="sm">${p.marca} · ${p.presentacion}</span></button>
+  <div class="pr">${money(pu(p,q))}</div><div class="sm">Desde ${p.cantidadMayorista} und: ${money(p.precioMayorista)}</div>${stock(p)}
+  <div class="q"><button data-a="m" data-v="${p.id}" aria-label="Menos">−</button><button class="n" data-a="pad" data-v="${p.id}" aria-label="Cantidad">${q}</button><button data-a="p" data-v="${p.id}" aria-label="Más">+</button></div>
+  <button class="pri" data-a="add" data-v="${p.id}" ${p.stock<=0?"disabled":""}>Agregar</button></div>`}
+
+function home(){
+  const mas=PROD.filter(p=>p.masVendido),rec=S.rec.map(prod).filter(Boolean);
+  return `<h2>Categorías</h2><div class="cats">${Object.entries(cats()).map(([c,i])=>`<button class="cat" data-a="cat" data-v="${E(c)}"><b>${i}</b>${c}</button>`).join("")}</div>
+  <h2>⭐ Más vendidos</h2><div class="row">${mas.map(mini).join("")}</div>
+  ${rec.length?`<h2>🕘 Vistos recientemente</h2><div class="row">${rec.map(mini).join("")}</div>`:""}
+  ${S.modo==="vendedor"?`<p><button data-a="panel">🎛 Panel de control</button> <button data-a="bal">📦 Balance</button></p>`:""}`}
+
+function lista(){
+  const n=S.nav,F=n.f;
+  const base=n.q?buscar(n.q):PROD.filter(p=>(!n.cat||p.categoria===n.cat)&&(!n.sub||p.subcategoria===n.sub));
+  const u=k=>[...new Set(base.map(p=>p[k]))].filter(Boolean).slice(0,10);
+  const R=[["Hasta S/ 20",0,20],["S/ 20 – 100",20,100],["Más de S/ 100",100,1e9]];
+  const L=base.filter(p=>(!F.marca||p.marca===F.marca)&&(!F.pres||p.presentacion===F.pres)&&(!F.rango||(pu(p,1)>=R[F.rango][1]&&pu(p,1)<R[F.rango][2])));
+  const subs=n.cat&&!n.sub&&!n.q?[...new Set(base.map(p=>p.subcategoria))]:[];
+  return `<div class="chips"><button data-a="home">🏠 Inicio</button>${n.cat?" › "+chip(n.cat,"cat",n.cat,0):""}${n.sub?" › <b>"+n.sub+"</b>":""}${n.q?" › <b>Búsqueda: "+esc(n.q)+"</b>":""}</div>
+  ${subs.length?`<b>Subcategoría</b><div class="chips">${subs.map(s=>chip(s,"sub",s,0)).join("")}</div>`:""}
+  <b>Filtros</b><div class="chips">${u("marca").map(m=>chip(m,"f","marca|"+m,F.marca===m)).join("")}${u("presentacion").map(m=>chip(m,"f","pres|"+m,F.pres===m)).join("")}${R.map((r,i)=>chip(r[0],"f","rango|"+i,F.rango==i&&F.rango!=null)).join("")}</div>
+  <h2>${L.length} producto${L.length==1?"":"s"}</h2>
+  ${L.length?`<div class="grid">${L.map(card).join("")}</div>`:`<p>😕 No hay productos con esos filtros.</p><button class="pri" data-a="wa0">💬 Consultar por WhatsApp</button>`}`}
+
+function vCart(){
+  const V=S.modo==="vendedor",it=items();
+  return `<div class="q"><h2 style="flex:1;margin:0">${V?"Cotización":"Mi carrito"}</h2><button data-a="cart" aria-label="Cerrar">✕</button></div>
+  <p class="sm"><b>${NEGOCIO.nombre}</b> · ${NEGOCIO.direccion}<br>${NEGOCIO.horario} · ${new Date().toLocaleDateString("es-PE")}</p>
+  ${V?`<div class="chips">${chip("Público","tipo","publico",S.tipo=="publico")}${chip("Mayorista","tipo","mayorista",S.tipo=="mayorista")}</div>
+  <input id="cn" placeholder="Nombre del cliente" value="${esc(S.cli.nombre)}" aria-label="Nombre del cliente"><input id="ct" type="tel" placeholder="Teléfono del cliente" value="${esc(S.cli.tel)}" aria-label="Teléfono">`
+  :`<div class="chips">${chip("🏪 Retiro en tienda","ent","retiro",S.ent=="retiro")}${chip("🚚 Despacho a domicilio","ent","domicilio",S.ent=="domicilio")}</div>${S.ent=="domicilio"?`<input id="cd" placeholder="Dirección de entrega" value="${esc(S.dir)}" aria-label="Dirección">`:""}`}
+  ${it.length?it.map(x=>`<div class="ln"><div><b>${x.p.nombre}</b><br><span class="sm">${x.p.presentacion} · ${x.q} × ${x.pr<x.pl?`<s>${money(x.pl)}</s> <b style="color:var(--na)">${money(x.pr)}</b> (−${Math.round((1-x.pr/x.pl)*100)}%)`:money(x.pr)}</span></div><b>${money(x.pr*x.q)}</b>
+  <div class="q"><button data-a="cm" data-v="${x.p.id}">−</button><span class="n" style="text-align:center;font-weight:700">${x.q}</span><button data-a="cp" data-v="${x.p.id}">+</button>${V?`<button data-a="neg" data-v="${x.p.id}" style="width:auto;padding:0 12px">💲 Negociar</button>`:""}<button data-a="cx" data-v="${x.p.id}" aria-label="Quitar">🗑</button></div></div>`).join(""):`<p>El carrito está vacío.</p>`}
+  <h2>Total: ${money(total())}</h2>
+  ${V?pfBtns(it.length):""}<div class="chips" ${V?'style="display:none"':""}><button class="pri" data-a="wa" ${it.length?"":"disabled"}>${V?"💬 Enviar por WhatsApp":"💬 Pedir por WhatsApp"}</button>
+  <button class="az" data-a="print">🖨 Imprimir / PDF</button><button data-a="copy">📋 Copiar</button>
+  ${V?`<button class="pri" data-a="nueva">🆕 Nueva atención</button>`:`<button data-a="vaciar">Vaciar</button>`}</div>`}
+
+// Vista rápida de un producto
+function openProd(id){
+  const p=prod(id);S.rec=[+id,...S.rec.filter(x=>x!=id)].slice(0,8);save();
+  const rel=PROD.filter(x=>x.id!=id&&(x.subcategoria===p.subcategoria||x.categoria===p.categoria)).slice(0,4);
+  const q=S.tmp[id]||1;
+  ov(`<div class="box"><div class="q"><b style="flex:1;font-size:20px">${p.nombre}</b><button data-a="close">✕</button></div>
+  <div class="img" style="font-size:80px">${p.imagen}</div><p>${p.categoria} › ${p.subcategoria}<br>Marca: <b>${p.marca}</b> · ${p.presentacion}<br>SKU: ${p.sku}</p>
+  <div class="pr">${money(pu(p,q))}</div><p class="sm">Desde ${p.cantidadMayorista} unidades: ${money(p.precioMayorista)} c/u</p>${stock(p)}
+  <div class="q" style="margin:10px 0"><button data-a="m2" data-v="${id}">−</button><button class="n" data-a="pad" data-v="${id}">${q}</button><button data-a="p2" data-v="${id}">+</button></div>
+  <button class="pri" style="width:100%" data-a="add" data-v="${id}" ${p.stock<=0?"disabled":""}>Agregar al carrito</button>
+  <h3>Quienes llevan esto también llevan…</h3><div class="row">${rel.map(mini).join("")}</div></div>`)}
+
+/* =====================================================
+   PROFORMA: cada venta del vendedor se genera como proforma numerada
+   Formatos: térmico 80 mm, térmico 58 mm o A4
+   ===================================================== */
+const fmtChips=()=>[["80","🧾 Térmico 80 mm"],["58","🧾 Térmico 58 mm"],["a4","📄 A4"]].map(([v,l])=>chip(l,"fmt",v,S.fmt===v)).join("");
+const pfBtns=n=>`<b>Formato de impresión</b><div class="chips">${fmtChips()}</div><div class="chips"><button class="pri" data-a="gen" data-v="NV" ${n?"":"disabled"}>🧾 Nota de venta</button><button data-a="gen" data-v="PF" ${n?"":"disabled"}>📄 Proforma</button><button data-a="hist">📜 Historial</button>${esAdmin()?`<button data-a="cfg">⚙ Personalizar recibo</button>`:""}<button data-a="nueva">🆕 Nueva atención</button></div>`;
+// Crea la proforma desde el carrito (si guardar=true le asigna número y la guarda en el historial)
+function mkDoc(guardar,tp){tp=tp||"NV";
+  const d={tp,estado:"venta",pv:NEGOCIO.pv,suc:NEGOCIO.sucursal,nro:guardar?numDoc(tp):"",fecha:new Date().toISOString(),cli:{nombre:S.cli.nombre,tel:S.cli.tel},tipo:tipo(),
+    it:items().map(x=>({n:x.p.nombre,pr:x.p.presentacion,q:x.q,pu:x.pr,pl:x.pl,k:x.p.sku})),total:total(),vend:USR()?USR().nombre:"",dto:items().reduce((s,x)=>s+(x.pl-x.pr)*x.q,0)};
+  if(guardar){HIST.unshift(d);savePF();save();items().forEach(x=>{x.p.stock=Math.max(0,x.p.stock-x.q);ST[x.p.sku]=x.p.stock});try{localStorage.setItem("sonic_stock",JSON.stringify(ST))}catch(e){}}
+  return d}
+function tDoc(d){return `*${TIT[d.tp||"PF"]} ${d.nro} - ${NEGOCIO.nombre}*\n`+(d.cli.nombre?`Cliente: ${d.cli.nombre}\n`:"")+"\n"+d.it.map(x=>`• ${x.q} x ${x.n} (${x.pr}) – ${money(x.pu*x.q)}`).join("\n")+`\n\n${d.dto>0?"Descuento: -"+money(d.dto)+"\n":""}*TOTAL: ${money(d.total)}*`+(NEGOCIO.cuentas?`\n\n*Cuentas:*\n${NEGOCIO.cuentas}`:"")+`\n\n${notaDe(d.tp)}`}
+// HTML del documento según el formato
+function pfHtml(d,f){
+  f=f||S.fmt;const a=f==="a4",N=NEGOCIO;
+  const cab=`<div class="c">${N.logo?`<img class="lg${a?" a":""}" src="${N.logo}" alt=""><br>`:""}<b style="font-size:${a?24:16}px">${esc(N.nombre)}</b>${N.ruc?"<br>RUC: "+esc(N.ruc):""}<br>${esc(N.direccion)}<br>WhatsApp: ${esc(N.whatsapp.replace(/^51/,""))}<br>${esc(N.horario)}</div>
+  <div class="c"><b>${d.nro?TIT[d.tp||"PF"]+"</b><br><b>"+d.nro:"PEDIDO"}</b><br>${new Date(d.fecha).toLocaleString("es-PE")}</div>
+  <div>Cliente: ${esc(d.cli.nombre||"Público en general")}${d.cli.doc?"<br>"+(d.tp==="FA"?"RUC: ":"DNI: ")+esc(d.cli.doc):""}${d.cli.dir?"<br>Dir.: "+esc(d.cli.dir):""}${d.cli.tel?"<br>Tel: "+esc(d.cli.tel):""}${d.tipo==="mayorista"?"<br>Precio mayorista":""}${d.vend?"<br>Atendió: "+esc(d.vend):""}</div>`;
+  const cuerpo=a?`<table><tr><th>Cant.</th><th>Descripción</th><th>P. unit.</th><th>Importe</th></tr>${d.it.map(x=>`<tr><td>${x.q}</td><td>${esc(x.n)} <span class="sm">${esc(x.pr)}</span></td><td>${x.pl>x.pu?"<s>"+money(x.pl)+"</s> ":""}${money(x.pu)}</td><td>${money(x.q*x.pu)}</td></tr>`).join("")}</table>`
+    :d.it.map(x=>`<div>${esc(x.n)} (${esc(x.pr)})</div><div class="r"><span>${x.q} x ${money(x.pu)}${x.pl>x.pu?" (lista "+money(x.pl)+")":""}</span><b>${money(x.q*x.pu)}</b></div>`).join("");
+  return `<div class="pf ${a?"a4":"t"+f}">${cab}<hr>${cuerpo}<hr>${d.dto>0?`<div class="r"><span>Descuento</span><span>-${money(d.dto)}</span></div>`:""}${d.tp==="BV"||d.tp==="FA"?`<div class="r"><span>Op. gravada</span><span>${money(d.total/(1+IGV))}</span></div><div class="r"><span>IGV ${IGV*100}%</span><span>${money(d.total-d.total/(1+IGV))}</span></div>`:""}<div class="r tot"><span>TOTAL</span><span>${money(d.total)}</span></div>${N.cuentas?`<hr><div class="sm" style="white-space:pre-line">${esc(N.cuentas)}</div>`:""}<p class="c sm">${esc(notaDe(d.tp))}</p></div>`}
+// Vista previa con opciones (imprimir, WhatsApp, copiar, nueva atención)
+function verPf(d){S.cur=d;
+  ov(`<div class="box" style="max-width:${S.fmt==="a4"?"860px":"440px"}"><div class="q"><b style="flex:1;font-size:20px">${d.nro||"Pedido"}</b><button data-a="close" aria-label="Cerrar">✕</button></div>
+  <b>Formato de impresión</b><div class="chips">${fmtChips()}</div><div class="pfw">${pfHtml(d)}</div>${pfEstado(d)}
+  <div class="chips"><button class="pri" data-a="prt">🖨 Imprimir</button><button data-a="wapf">💬 WhatsApp</button><button data-a="cpf">📋 Copiar</button><button class="az" data-a="nueva">🆕 Nueva atención</button></div></div>`)}
+// Imprime ajustando el tamaño de papel (@page) al formato elegido
+function prt(d,f){f=f||S.fmt;$("#pf").innerHTML=pfHtml(d,f);
+  $("#pg").textContent=f==="a4"?"@page{size:A4;margin:12mm}":`@page{size:${f==="80"?80:58}mm auto;margin:3mm}`;window.print()}
+
+/* =====================================================
+   HISTORIAL (búsqueda por fecha, número o cliente) Y RESPALDO
+   ===================================================== */
+const ymd=f=>{const x=new Date(f);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")};
+function histList(){
+  const d1=$("#hd").value,d2=$("#hh").value,t=norm($("#hs").value),tp=$("#ht").value;
+  const L=HIST.filter(d=>{const f=ymd(d.fecha);return(!tp||(d.tp||"PF")===tp)&&(veTodo()||d.vend===(USR()||{}).nombre)&&(!d1||f>=d1)&&(!d2||f<=d2)&&(!t||norm(d.nro+" "+d.cli.nombre+" "+d.cli.tel+" "+(d.vend||"")).includes(t))});
+  {const V=L.filter(d=>d.estado!=="convertida");$("#hc").textContent=`${L.length} documento${L.length==1?"":"s"} · Ventas: ${money(V.reduce((s,d)=>s+d.total,0))} (${V.length})`}
+  $("#hl").innerHTML=(L.slice(0,100).map(d=>`<button class="si" data-a="ver" data-v="${E(d.nro)}"><span style="flex:1"><b>${d.nro}</b> ${d.estado==="convertida"?`<span class="sm">→ ${esc(d.conv)}</span>`:""} · ${esc(d.cli.nombre||"Público")}<br><span class="sm">${TIT[d.tp||"PF"]} · ${new Date(d.fecha).toLocaleString("es-PE")}${d.vend?" · "+esc(d.vend):""}</span></span><b>${money(d.total)}</b></button>`).join("")||"<p>No hay proformas con ese filtro.</p>")+(L.length>100?`<p class="sm">Mostrando las 100 más recientes. Afina la búsqueda para ver otras.</p>`:"")}
+function dl(n,t,m,bom){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([(bom?"\ufeff":"")+t],{type:m+";charset=utf-8"}));a.download=n;a.click()}
+let LOGOTMP;   // logo elegido en la ventana de personalización (undefined = sin cambios, null = quitar)
+
+/* =====================================================
+   VENDEDORES: registro, inicio de sesión con PIN, panel de control y negociación
+   ===================================================== */
+let LG={id:"",v:"",err:0};
+function login(){
+  if(!VEND.length)return vform("",true);
+  ov(`<div class="box" style="max-width:380px"><div class="q"><h2 style="flex:1;margin:0">¿Quién atiende?</h2><button data-a="close" aria-label="Cerrar">✕</button></div>${VEND.map(v=>`<button class="si" data-a="lgsel" data-v="${v.id}">👤 <b>${esc(v.nombre)}</b>${v.rol==="admin"?" · admin":v.rol==="almacen"?" · almacén":""}</button>`).join("")}</div>`)}
+function drawLg(){const u=VEND.find(v=>v.id===LG.id);
+  ov(`<div class="box" style="max-width:340px"><h2 style="text-align:center;margin:0">👤 ${esc(u.nombre)}</h2><p class="sm" style="text-align:center">${LG.err?"PIN incorrecto, intenta de nuevo":"Ingresa tu PIN de 4 dígitos"}</p>
+  <h2 style="text-align:center;letter-spacing:8px">${"●".repeat(LG.v.length)}${"○".repeat(4-LG.v.length)}</h2>
+  <div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-a="lgk" data-v="${n}">${n}</button>`).join("")}<button data-a="login">←</button><button data-a="lgk" data-v="0">0</button><button data-a="lgk" data-v="c">⌫</button></div></div>`)}
+async function checkLogin(){const u=VEND.find(v=>v.id===LG.id),h=await hsh(u.id+LG.v);
+  if(h===u.h){SES=u.id;try{sessionStorage.setItem("sonic_ses",SES)}catch(e){}S.modo="vendedor";ov("");render()}
+  else{LG.v="";LG.err=1;drawLg()}}
+// Formulario para registrar o editar un vendedor (primero=true: primer registro, queda como administrador)
+function vform(id,primero){const u=VEND.find(v=>v.id===id)||{};
+  ov(`<div class="box" style="max-width:420px"><div class="q"><h2 style="flex:1;margin:0">${primero?"Registro del administrador":id?"Editar vendedor":"Nuevo vendedor"}</h2>${primero?`<button data-a="close" aria-label="Cerrar">✕</button>`:`<button data-a="vend" aria-label="Volver">✕</button>`}</div>
+  ${primero?`<p class="sm">Primer registro: esta persona será la administradora del sistema.</p>`:""}
+  <label>Nombre<input id="v_n" value="${esc(u.nombre||"")}"></label>
+  <label>PIN de 4 números${id?" (vacío = no cambiarlo)":""}<input id="v_p" type="password" inputmode="numeric" maxlength="4" autocomplete="off"></label>
+  ${primero?"":`<label>Rol<select id="v_r" style="width:100%;min-height:48px;border:2px solid #c5cde0;border-radius:12px;font:inherit"><option value="vendedor" ${u.rol==="vendedor"||!u.rol?"selected":""}>Vendedor</option><option value="almacen" ${u.rol==="almacen"?"selected":""}>Almacén (ve las ventas de todos)</option><option value="admin" ${u.rol==="admin"?"selected":""}>Administrador (acceso total, sin límite de descuento)</option></select></label>
+  <label>Descuento máximo permitido (%)<input id="v_d" type="number" min="0" max="100" inputmode="decimal" value="${u.maxDesc??10}"></label>`}
+  <button class="pri" style="width:100%;margin-top:10px" data-a="vok" data-v="${id||""}|${primero?1:0}">Guardar</button></div>`)}
+function vend(){if(!esAdmin())return;
+  ov(`<div class="box" style="max-width:480px"><div class="q"><h2 style="flex:1;margin:0">Vendedores</h2><button data-a="panel" aria-label="Volver">✕</button></div>
+  ${VEND.map(v=>`<div class="ln"><div><b>${esc(v.nombre)}</b><br><span class="sm">${v.rol==="admin"?"Administrador":v.rol==="almacen"?"Almacén":"Vendedor · descuento máx. "+v.maxDesc+"%"}</span></div><div class="q"><button data-a="vedit" data-v="${v.id}" style="width:auto;padding:0 12px">Editar</button><button data-a="vdel" data-v="${v.id}" aria-label="Quitar">🗑</button></div></div>`).join("")}
+  <button class="pri" style="width:100%;margin-top:10px" data-a="vnew">➕ Nuevo vendedor</button></div>`)}
+function panel(){const u=USR();if(!u)return login();
+  ov(`<div class="box" style="max-width:420px"><div class="q"><h2 style="flex:1;margin:0">🎛 Panel de control</h2><button data-a="close" aria-label="Cerrar">✕</button></div>
+  <p>👤 <b>${esc(u.nombre)}</b> · ${u.rol==="admin"?"Administrador":u.rol==="almacen"?"Almacén":"Vendedor (descuento máx. "+u.maxDesc+"%)"}</p>
+  <div class="chips" style="flex-direction:column;align-items:stretch"><button data-a="bal">📦 Balance de almacén (ventas del día)</button>${veTodo()?`<button data-a="stk">📦 Ajustar stock (ingresos)</button>`:""}<button data-a="hist">📜 Ventas y documentos</button>
+  ${esAdmin()?`<button data-a="vend">👥 Vendedores</button><button data-a="reg">💸 Reglas de descuento</button><button data-a="cfg">⚙ Personalizar recibo y marca</button><button data-a="imp">📥 Importar productos (CSV)</button>`:""}
+  <button class="az" data-a="salir">🚪 Cerrar sesión</button></div></div>`)}
+// Negociación: el vendedor cambia el precio por unidad (no puede bajar del mínimo que le permite su descuento máximo)
+let NG={id:0,v:""};
+const cats=()=>{const c=Object.assign({},CATS);PROD.forEach(p=>{if(p.categoria&&!c[p.categoria])c[p.categoria]=p.imagen||"📦"});return c};
+// Descuento máximo vigente para el vendedor: su límite base, reducido si el cliente es mayorista y ampliado en compras grandes
+const maxDescEf=()=>{if(esAdmin())return 100;let m=USR().maxDesc||0;
+  if(tipo()==="mayorista")m*=REG.mayoristaPct/100;
+  if(REG.monto>0&&items().reduce((s,x)=>s+x.pl*x.q,0)>=REG.monto)m+=REG.extra;
+  return Math.min(100,m)};
+const minPrecio=pl=>esAdmin()?0.01:Math.ceil(pl*(1-maxDescEf()/100)*100)/100;
+function drawNg(msg){const x=items().find(i=>i.p.id==NG.id),min=minPrecio(x.pl);
+  ov(`<div class="box" style="max-width:360px"><b>${esc(x.p.nombre)}</b><p class="sm">Precio de lista: ${money(x.pl)} · ${esAdmin()?"sin límite de descuento":"mínimo permitido: "+money(min)+" (descuento máx. "+(Math.round(maxDescEf()*10)/10)+"%)"}</p>
+  <h2 style="text-align:center;margin:4px 0">S/ ${NG.v||"0"}</h2><p style="color:#a00;margin:0;text-align:center">${msg||"&nbsp;"}</p>
+  <div class="chips">${[5,10].map(p=>`<button data-a="ngp" data-v="${p}">−${p}%</button>`).join("")}<button data-a="ngr">Precio de lista</button></div>
+  <div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-a="ngk" data-v="${n}">${n}</button>`).join("")}<button data-a="ngk" data-v=".">.</button><button data-a="ngk" data-v="0">0</button><button data-a="ngk" data-v="c">⌫</button></div>
+  <div class="chips"><button data-a="close">Cancelar</button><button class="pri" style="flex:1" data-a="ngok">Aplicar precio</button></div></div>`)}
+
+/* =====================================================
+   NOTA DE VENTA / PROFORMA / BOLETA / FACTURA
+   Todo documento generado cuenta como VENTA registrada (y descuenta stock).
+   La proforma o nota de venta se puede convertir en boleta o factura (la original queda "convertida" y no se suma dos veces).
+   OJO: boleta y factura de este programa son documentos de CONTROL INTERNO. Para que tengan validez tributaria en Perú
+   deben emitirse como comprobantes electrónicos desde un sistema autorizado por SUNAT.
+   ===================================================== */
+const IGV=0.18;
+const TIT={NV:"NOTA DE VENTA",PF:"PROFORMA",BV:"BOLETA DE VENTA",FA:"FACTURA"};
+const ser=tp=>({NV:"NV",PF:"P",BV:"B",FA:"F"})[tp]+NEGOCIO.pv;   // serie = letra del documento + código del equipo (ej. NV001, B002)
+const numDoc=tp=>ser(tp)+"-"+String(S.cnt[tp]++).padStart(6,"0");
+const notaDe=tp=>tp==="NV"?NEGOCIO.notaNV:(tp==="BV"||tp==="FA")?NEGOCIO.notaFiscal:NEGOCIO.nota;
+const pfEstado=d=>(d.estado==="convertida"?`<p class="sm">✔ Convertida en <b>${esc(d.conv)}</b></p>`:((d.tp==="NV"||d.tp==="PF"||!d.tp)&&d.nro?`<div class="chips"><button data-a="cv" data-v="BV">🧾 Convertir en boleta</button><button data-a="cv" data-v="FA">📑 Convertir en factura</button></div>`:""))+(d.ref?`<p class="sm">Origen: ${esc(d.ref)}</p>`:"");
+
+/* =====================================================
+   BALANCE DE ALMACÉN (ventas del día, de 00:00 a 23:59) Y WHATSAPP MÚLTIPLE
+   ===================================================== */
+let VOLVER="hist";
+const veTodo=()=>esAdmin()||(!!USR()&&USR().rol==="almacen");
+const tel=x=>{x=String(x||"").replace(/\D/g,"");return x.length===9?"51"+x:x};
+// Suma las unidades vendidas ese día. Cuenta la fecha de la venta original (una conversión a boleta/factura no se cuenta dos veces)
+function balData(f){
+  const me=USR(),todo=veTodo();
+  const L=HIST.filter(d=>d.estado!=="convertida"&&ymd(d.fvta||d.fecha)===f&&(todo||d.vend===me.nombre));
+  const P={},V={},Su={};let u=0,m=0;
+  L.forEach(d=>{const v=d.vend||"—",s=d.suc||"Principal";V[v]=(V[v]||0)+d.total;Su[s]=(Su[s]||0)+d.total;m+=d.total;
+    d.it.forEach(x=>{const k=x.k||x.n+"|"+x.pr,o=P[k]||(P[k]={n:x.n,pr:x.pr,k:x.k,q:0,t:0});o.q+=x.q;o.t+=x.q*x.pu;u+=x.q})});
+  return{L,P:Object.values(P).sort((a,b)=>b.q-a.q),V,Su,u,m}}
+function balHtml(f){
+  const B=balData(f),hoy=ymd(new Date())===f;
+  const est=hoy?`🟢 En curso · actualizado ${new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"})} (el día cierra a las 23:59)`:"🔒 Día cerrado (23:59)";
+  const rows=B.P.map(o=>{const p=o.k&&PROD.find(q=>q.sku===o.k);
+    return `<tr><td>${esc(o.n)} <span class="sm">${esc(o.pr)}</span></td><td style="text-align:right"><b>${o.q}</b></td><td>${money(o.t)}</td><td>${p?(p.stock<=5?"⚠ ":"")+p.stock:"–"}</td></tr>`}).join("");
+  const lst=O=>Object.entries(O).map(([k,v])=>esc(k)+" "+money(v)).join(" · ")||"–";
+  return `<div class="pf a4"><div class="c"><b style="font-size:20px">${esc(NEGOCIO.nombre)} · BALANCE DE ALMACÉN</b><br>${new Date(f+"T12:00:00").toLocaleDateString("es-PE",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}<br>${est}</div>
+  <p><b>${B.u}</b> unidades vendidas · <b>${money(B.m)}</b> · ${B.L.length} documento(s)</p>
+  ${rows?`<table><tr><th>Producto</th><th style="text-align:right">Unid.</th><th>Monto</th><th>Stock actual*</th></tr>${rows}</table>`:"<p>No hay ventas en este día.</p>"}
+  <p class="sm">Por vendedor: ${lst(B.V)}<br>Por sucursal: ${lst(B.Su)}<br>*Stock actual de este equipo (⚠ = 5 o menos).</p></div>`}
+function balance(f){f=f||ymd(new Date());S.bf=f;
+  ov(`<div class="box" style="max-width:860px"><div class="q"><h2 style="flex:1;margin:0">📦 Balance de almacén</h2><button data-a="close" aria-label="Cerrar">✕</button></div>
+  <label>Día<input id="bd" type="date" value="${f}" max="${ymd(new Date())}"></label>
+  <div class="chips"><button data-a="bal">Hoy</button><button data-a="bal" data-v="ayer">Ayer</button><button data-a="balr">🔄 Actualizar</button></div>
+  <div class="pfw" id="bc">${balHtml(f)}</div>
+  <div class="chips"><button class="pri" data-a="balp">🖨 Imprimir</button><button data-a="balw">💬 WhatsApp</button><button data-a="balx">⬇ Archivo del día</button>${veTodo()?`<button data-a="rest2">📂 Importar ventas de otro equipo</button>`:""}</div></div>`)}
+// WhatsApp con varios números: el cliente elige con quién hablar o se asigna uno al azar
+const waList=()=>[{n:NEGOCIO.waNombre||"Ventas",t:NEGOCIO.whatsapp}].concat((NEGOCIO.otros||[]).filter(o=>o&&o.t));
+let WAT="";
+function waElegir(txt){const L=waList();if(L.length<2)return wa(L[0].t,txt);WAT=txt;
+  ov(`<div class="box" style="max-width:380px"><div class="q"><h2 style="flex:1;margin:0">¿Con quién quieres hablar?</h2><button data-a="close" aria-label="Cerrar">✕</button></div>${L.map((x,i)=>`<button class="si" data-a="waN" data-v="${i}">💬 <b>${esc(x.n)}</b></button>`).join("")}<button class="si pri" data-a="waN" data-v="auto">🎲 Cualquiera (se asigna uno)</button></div>`)}
+
+// Ajuste de stock de ESTE equipo: ingreso de mercadería (+ Sumar) o corrección (Fijar). Lo puede usar el administrador y el almacén
+function stkForm(){if(!veTodo())return;
+  ov(`<div class="box" style="max-width:560px"><div class="q"><h2 style="flex:1;margin:0">Ajustar stock</h2><button data-a="panel" aria-label="Volver">✕</button></div>
+  <p class="sm">Registra ingresos de mercadería o correcciones. Cambia el stock de esta tablet/sucursal.</p>
+  <input id="st_q" type="search" placeholder="Buscar producto o SKU" aria-label="Buscar producto"><div id="st_l"></div></div>`);stkList()}
+function stkList(){const t=(($("#st_q")||{}).value||"").trim(),L=(t.length>=2?buscar(t):PROD.filter(p=>p.stock<=5)).slice(0,12);
+  $("#st_l").innerHTML=(t.length<2?`<p class="sm">Mostrando productos con 5 o menos unidades. Escribe para buscar otro.</p>`:"")+(L.map(p=>`<div class="ln"><div><b>${esc(p.nombre)}</b><br><span class="sm">${esc(p.presentacion)} · ${p.sku} · Stock: <b>${p.stock}</b></span></div>
+  <div class="q"><input id="st_${p.id}" type="number" inputmode="numeric" min="0" placeholder="Cant." style="margin:0;width:90px"><button data-a="stok" data-v="${p.id}|s" style="width:auto;padding:0 10px">Fijar</button><button data-a="stok" data-v="${p.id}|a" style="width:auto;padding:0 10px">+ Sumar</button></div></div>`).join("")||"<p>Sin resultados.</p>")}
+
+// Teclado numérico grande para cantidades
+let NP={id:0,v:""};
+function numpad(id){NP={id,v:""};drawPad()}
+function drawPad(){ov(`<div class="box" style="max-width:340px"><h2 style="text-align:center;margin:0 0 8px">${NP.v||"0"}</h2><div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-a="np" data-v="${n}">${n}</button>`).join("")}<button data-a="np" data-v="c">⌫</button><button data-a="np" data-v="0">0</button><button class="pri" data-a="np" data-v="ok">OK</button></div></div>`)}
+function ov(h){const o=$("#ov");o.innerHTML=h;o.className=h?"on":""}
+
+/* =====================================================
+   8. ACCIONES (todo se maneja con toques)
+   ===================================================== */
+function render(){
+  $("#main").innerHTML=(S.nav.cat||S.nav.q)?lista():home();
+  document.body.className=S.modo==="vendedor"?"v":"";
+  $("#modo").textContent=S.modo==="vendedor"?"🚪 Salir · Modo cliente":"🧰 Modo vendedor";$("#modo").style.display=MODO_PUBLICO?"none":"";
+  $("#nueva").style.display=S.modo==="vendedor"?"":"none";$("#panel").style.display=S.modo==="vendedor"?"":"none";$("#balb").style.display=S.modo==="vendedor"?"":"none";
+  $("#cbtn").textContent=`🛒 ${cant()} · ${money(total())}`;
+  $("#cart").innerHTML=vCart();
+  $("#logo").innerHTML=(NEGOCIO.logo?`<img src="${NEGOCIO.logo}" alt="" style="height:40px;vertical-align:middle;background:#fff;border-radius:8px;padding:2px"> `:"🔧 ")+esc(NEGOCIO.nombre);document.title=NEGOCIO.nombre+" – Ferretería";
+  $("#foot").innerHTML=`${NEGOCIO.nombre} · ${NEGOCIO.direccion} · ${NEGOCIO.horario}`;
+  save()}
+const setQ=(id,d)=>{S.tmp[id]=Math.max(1,(S.tmp[id]||1)+d)};
+const A={
+  home(){S.nav={cat:null,sub:null,f:{},q:""};$("#q").value="";render()},
+  cat(v){S.nav={cat:D(v),sub:null,f:{},q:""};render()},
+  sub(v){S.nav.sub=D(v);S.nav.f={};render()},
+  f(v){const[k,val]=D(v).split("|");S.nav.f[k]=S.nav.f[k]==val?null:val;render()},
+  open(v){openProd(v)},close(){ov("")},
+  m(v){setQ(v,-1);render()},p(v){setQ(v,1);render()},
+  m2(v){setQ(v,-1);openProd(v)},p2(v){setQ(v,1);openProd(v)},
+  pad(v){numpad(v)},
+  np(v){v=D(v);if(v=="c")NP.v=NP.v.slice(0,-1);else if(v=="ok"){S.tmp[NP.id]=Math.max(1,parseInt(NP.v)||1);ov("");render();return}else NP.v=(NP.v+v).slice(0,4);drawPad()},
+  add(v){const p=prod(v);S.cart[v]=(S.cart[v]||0)+(S.tmp[v]||1);S.tmp[v]=1;ov("");render()},
+  cart(){$("#cart").classList.toggle("on")},
+  cp(v){S.cart[v]++;render()},cm(v){if(S.cart[v]>1)S.cart[v]--;else{delete S.cart[v];delete S.neg[v]}render()},cx(v){delete S.cart[v];delete S.neg[v];render()},
+  vaciar(){S.cart={};S.neg={};render()},
+  tipo(v){S.tipo=D(v);render()},ent(v){S.ent=D(v);render()},
+  modo(){if(S.modo==="vendedor")return A.salir();if(USR()){S.modo="vendedor";render()}else login()},
+  nueva(){ov("");S.cur=null;S.cart={};S.neg={};S.cli={nombre:"",tel:""};S.tmp={};S.tipo="publico";S.nav={cat:null,sub:null,f:{},q:""};$("#q").value="";$("#cart").classList.remove("on");render()},
+  wa(){if(S.modo==="vendedor")wa(waNum(),texto());else waElegir(texto())},
+  wa0(){waElegir("Hola "+NEGOCIO.nombre+", busco: "+($("#q").value||S.nav.q||"un producto"))},
+  print(){prt(mkDoc(false),"a4")},
+  copy(v,t){(navigator.clipboard?navigator.clipboard.writeText(texto()):Promise.reject()).then(()=>t.textContent="✔ Copiado").catch(()=>prompt("Copia el texto:",texto()))},
+  fq(v){$("#q").value=D(v);S.nav={cat:null,sub:null,f:{},q:D(v)};$("#sug").style.display="none";render()},
+  all(){S.nav={cat:null,sub:null,f:{},q:$("#q").value};$("#sug").style.display="none";render()},
+  imp(){if(esAdmin())$("#file").click()},
+  gen(v){if(!items().length)return;
+    if(!esAdmin()){let fix=0;items().forEach(x=>{const m=minPrecio(x.pl);if(x.pr<m){S.neg[x.p.id]=m;fix++}});
+      if(fix){render();return alert("Algunos precios superaban tu descuento máximo vigente y se ajustaron al mínimo. Revisa el total y vuelve a generar.")}}
+    $("#cart").classList.remove("on");verPf(mkDoc(true,v||"NV"));render()},
+  fmt(v){S.fmt=D(v);save();if(S.cur&&$("#ov").className==="on")verPf(S.cur);else render()},
+  prt(){prt(S.cur)},
+  wapf(){const d=S.cur,g=(d.cli.tel||"").replace(/\D/g,"");wa(g.length>=9?(g.length===9?"51"+g:g):NEGOCIO.whatsapp,tDoc(d))},
+  cpf(v,t){const x=tDoc(S.cur);(navigator.clipboard?navigator.clipboard.writeText(x):Promise.reject()).then(()=>t.textContent="✔ Copiado").catch(()=>prompt("Copia el texto:",x))},
+  hist(){ov(`<div class="box" style="max-width:600px"><div class="q"><h2 style="flex:1;margin:0">Ventas y documentos</h2><button data-a="close" aria-label="Cerrar">✕</button></div>
+  <div class="chips">${chip("Hoy","hq","hoy",0)}${chip("Este mes","hq","mes",0)}${chip("Todo","hq","todo",0)}</div>
+  <label>Tipo de documento<select id="ht" style="width:100%;min-height:48px;border:2px solid #c5cde0;border-radius:12px;font:inherit"><option value="">Todos</option><option value="NV">Notas de venta</option><option value="BV">Boletas</option><option value="FA">Facturas</option><option value="PF">Proformas</option></select></label><label>Desde<input id="hd" type="date"></label><label>Hasta<input id="hh" type="date"></label>
+  <input id="hs" type="search" placeholder="Buscar por número o cliente" aria-label="Buscar proforma">
+  <p class="sm" id="hc"></p><div id="hl"></div>
+  ${esAdmin()?`<div class="chips"><button data-a="expcsv">⬇ Excel (CSV)</button><button data-a="expjson">💾 Respaldo</button><button data-a="rest">📂 Restaurar</button></div>`:""}</div>`);histList()},
+  ver(v){const d=HIST.find(x=>x.nro===D(v));if(d)verPf(d)},
+  hq(v){v=D(v);const h=ymd(new Date());$("#hd").value=v==="hoy"?h:v==="mes"?h.slice(0,8)+"01":"";$("#hh").value=v==="todo"?"":h;histList()},
+  expcsv(){const q=x=>'"'+String(x).replace(/"/g,'""')+'"';dl("proformas-"+ymd(new Date())+".csv",["nro,fecha,cliente,telefono,doc_identidad,tipo,total,descuento,vendedor,documento,estado,origen,detalle"].concat(HIST.map(d=>[d.nro,new Date(d.fecha).toLocaleString("es-PE"),d.cli.nombre,d.cli.tel,d.cli.doc||"",d.tipo,d.total.toFixed(2),(d.dto||0).toFixed(2),d.vend||"",TIT[d.tp||"PF"],d.estado||"venta",d.ref||"",d.it.map(x=>x.q+" x "+x.n).join("; ")].map(q).join(","))).join("\n"),"text/csv",true)},
+  expjson(){dl("respaldo-proformas-"+ymd(new Date())+".json",JSON.stringify(HIST),"application/json")},
+  rest(){VOLVER="hist";$("#file2").click()},rest2(){VOLVER="bal";$("#file2").click()},
+  cfg(){if(!esAdmin())return;LOGOTMP=undefined;const N=NEGOCIO;ov(`<div class="box"><div class="q"><h2 style="flex:1;margin:0">Personalizar recibo y marca</h2><button data-a="close" aria-label="Cerrar">✕</button></div>
+  <b>Logotipo</b><div id="lgp" style="min-height:60px;margin:6px 0">${N.logo?`<img src="${N.logo}" alt="" style="max-width:200px;max-height:80px">`:"<span class='sm'>Sin logotipo</span>"}</div>
+  <div class="chips"><button data-a="lgup">🖼 Subir logotipo</button><button data-a="lgdel">Quitar</button></div>
+  <label>Nombre del negocio<input id="c_nombre" value="${esc(N.nombre)}"></label>
+  <label>RUC (opcional)<input id="c_ruc" value="${esc(N.ruc)}"></label>
+  <label>Dirección<input id="c_direccion" value="${esc(N.direccion)}"></label>
+  <label>WhatsApp principal con código de país (ej. 51971814963)<input id="c_whatsapp" inputmode="numeric" value="${esc(N.whatsapp)}"></label>
+  <label>Nombre del WhatsApp principal (ej. Ventas, Carlos)<input id="c_wn" value="${esc(N.waNombre||"")}"></label>
+  <label>WhatsApp 2 – nombre<input id="c_n2" value="${esc((N.otros[0]||{}).n||"")}"></label>
+  <label>WhatsApp 2 – número<input id="c_t2" inputmode="numeric" value="${esc((N.otros[0]||{}).t||"")}"></label>
+  <label>WhatsApp 3 – nombre<input id="c_n3" value="${esc((N.otros[1]||{}).n||"")}"></label>
+  <label>WhatsApp 3 – número<input id="c_t3" inputmode="numeric" value="${esc((N.otros[1]||{}).t||"")}"></label>
+  <label>WhatsApp de almacén (para enviar el balance; opcional)<input id="c_wal" inputmode="numeric" value="${esc(N.wsAlmacen||"")}"></label>
+  <label>Sucursal de este equipo<input id="c_suc" value="${esc(N.sucursal)}"></label>
+  <label>Código de este equipo (3 dígitos; distinto en cada tablet, ej. 001, 002)<input id="c_pv" inputmode="numeric" maxlength="3" value="${esc(N.pv)}"></label>
+  <label>Horario<input id="c_horario" value="${esc(N.horario)}"></label>
+  <label>Cuentas bancarias / Yape / Plin (una por línea)<textarea id="c_cuentas">${esc(N.cuentas)}</textarea></label>
+  <label>Nota al pie de la proforma<textarea id="c_nota">${esc(N.nota)}</textarea></label>
+  <label>Nota al pie de la nota de venta<textarea id="c_nnv">${esc(N.notaNV)}</textarea></label>
+  <label>Nota al pie de boleta / factura<textarea id="c_nfi">${esc(N.notaFiscal)}</textarea></label>
+  <button class="pri" style="width:100%;margin-top:10px" data-a="cfgok">Guardar</button></div>`)},
+  reg(){if(!esAdmin())return;ov(`<div class="box" style="max-width:420px"><div class="q"><h2 style="flex:1;margin:0">Reglas de descuento</h2><button data-a="panel" aria-label="Volver">✕</button></div>
+  <p class="sm">Se aplican a los vendedores (el administrador no tiene límite) y parten del descuento máximo de cada vendedor.</p>
+  <label>Cliente mayorista: % de su límite que se mantiene (ej. 50 = la mitad)<input id="r_m" type="number" min="0" max="100" inputmode="decimal" value="${REG.mayoristaPct}"></label>
+  <label>Compra grande desde S/ (a precio de lista; 0 = desactivado)<input id="r_s" type="number" min="0" inputmode="decimal" value="${REG.monto}"></label>
+  <label>Puntos extra de descuento en compra grande (%)<input id="r_e" type="number" min="0" max="100" inputmode="decimal" value="${REG.extra}"></label>
+  <button class="pri" style="width:100%;margin-top:10px" data-a="rgok">Guardar</button></div>`)},
+  rgok(){const g=id=>Math.max(0,parseFloat($("#"+id).value)||0);REG={mayoristaPct:Math.min(100,g("r_m")),monto:g("r_s"),extra:Math.min(100,g("r_e"))};
+    try{localStorage.setItem("sonic_reglas",JSON.stringify(REG))}catch(e){}panel()},
+  cv(v){const o=S.cur;if(!o||o.estado==="convertida")return;const F=v==="FA";
+    ov(`<div class="box" style="max-width:420px"><div class="q"><h2 style="flex:1;margin:0">Convertir ${o.nro} en ${F?"factura":"boleta"}</h2><button data-a="close" aria-label="Cerrar">✕</button></div>
+    <p class="sm">Total: <b>${money(o.total)}</b></p>
+    <label>${F?"Razón social":"Nombre del cliente"}<input id="k_n" value="${esc(o.cli.nombre||"")}"></label>
+    <label>${F?"RUC (11 dígitos)":"DNI (8 dígitos)"+(o.total>700?" — obligatorio desde S/ 700":" — opcional")}<input id="k_d" inputmode="numeric" maxlength="${F?11:8}" value="${esc(o.cli.doc||"")}"></label>
+    <label>Dirección${F?"":" (opcional)"}<input id="k_a" value="${esc(o.cli.dir||"")}"></label>
+    <button class="pri" style="width:100%;margin-top:10px" data-a="cvok" data-v="${v}">Emitir ${F?"factura":"boleta"}</button></div>`)},
+  cvok(v){const o=S.cur,F=v==="FA",n=$("#k_n").value.trim(),dc=$("#k_d").value.trim(),dir=$("#k_a").value.trim();
+    if(!n)return alert(F?"Escribe la razón social.":"Escribe el nombre del cliente.");
+    if(F){if(!/^(10|20)\d{9}$/.test(dc))return alert("El RUC debe tener 11 dígitos y empezar con 10 o 20.");if(!dir)return alert("La factura requiere la dirección del cliente.")}
+    else if((o.total>700&&!/^\d{8}$/.test(dc))||(dc&&!/^\d{8}$/.test(dc)))return alert("Escribe un DNI de 8 dígitos (obligatorio en boletas desde S/ 700).");
+    const nd=Object.assign({},o,{tp:v,estado:"venta",nro:numDoc(v),fecha:new Date().toISOString(),fvta:o.fvta||o.fecha,ref:o.nro,cli:Object.assign({},o.cli,{nombre:n,doc:dc,dir})});
+    delete nd.conv;o.estado="convertida";o.conv=nd.nro;HIST.unshift(nd);savePF();save();verPf(nd)},
+  bal(v){const d=new Date();if(v==="ayer")d.setDate(d.getDate()-1);balance(ymd(d))},
+  balr(){balance(S.bf)},
+  balp(){$("#pf").innerHTML=balHtml(S.bf);$("#pg").textContent="@page{size:A4;margin:12mm}";window.print()},
+  balw(){const B=balData(S.bf),hoy=ymd(new Date())===S.bf;
+    wa(NEGOCIO.wsAlmacen||"",`*Balance de almacén – ${NEGOCIO.nombre}*\n${S.bf}${hoy?" (parcial "+new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"})+")":""}\n\n`+B.P.map(o=>`• ${o.q} u – ${o.n} (${o.pr})`).join("\n")+`\n\n*Total: ${B.u} unidades · ${money(B.m)}*`)},
+  balx(){const f=S.bf;dl("cierre-"+NEGOCIO.pv+"-"+f+".json",JSON.stringify(HIST.filter(d=>ymd(d.fecha)===f||ymd(d.fvta||d.fecha)===f)),"application/json")},
+  waN(v){const L=waList(),i=v==="auto"?Math.floor(Math.random()*L.length):+v;ov("");wa(L[i].t,WAT)},
+  stk(){stkForm()},
+  stok(v){const[id,m]=v.split("|"),p=prod(id),n=parseInt($("#st_"+id).value);
+    if(!(n>=0))return alert("Escribe una cantidad (0 o más).");
+    p.stock=m==="a"?p.stock+n:n;ST[p.sku]=p.stock;try{localStorage.setItem("sonic_stock",JSON.stringify(ST))}catch(e){}stkList();render()},
+  panel(){panel()},login(){login()},vend(){vend()},
+  lgsel(v){LG={id:v,v:"",err:0};drawLg()},
+  lgk(v){v=D(v);if(v==="c")LG.v=LG.v.slice(0,-1);else if(LG.v.length<4)LG.v+=v;LG.err=0;if(LG.v.length===4)checkLogin();else drawLg()},
+  salir(){SES=null;try{sessionStorage.removeItem("sonic_ses")}catch(e){}S.modo="cliente";S.neg={};S.cur=null;ov("");$("#cart").classList.remove("on");render()},
+  vnew(){vform("")},vedit(v){vform(v)},
+  vdel(v){const u=VEND.find(x=>x.id===v);
+    if(u.rol==="admin"&&VEND.filter(x=>x.rol==="admin").length<2)return alert("Debe quedar al menos un administrador.");
+    if(u.id===SES)return alert("No puedes eliminar tu propia cuenta mientras la usas.");
+    if(confirm("¿Eliminar a "+u.nombre+"?")){VEND=VEND.filter(x=>x.id!==v);saveV();vend()}},
+  async vok(v){const[id,pr]=v.split("|"),n=$("#v_n").value.trim(),p=$("#v_p").value.trim();
+    if(!n)return alert("Escribe el nombre.");
+    if((!id&&!/^\d{4}$/.test(p))||(p&&!/^\d{4}$/.test(p)))return alert("El PIN debe tener 4 números.");
+    let u=VEND.find(x=>x.id===id);const rol=pr==="1"?"admin":($("#v_r")?$("#v_r").value:"vendedor"),admin=rol==="admin";
+    if(u&&u.rol==="admin"&&!admin&&VEND.filter(x=>x.rol==="admin").length<2)return alert("Debe quedar al menos un administrador.");
+    if(!u){u={id:Date.now().toString(36)};VEND.push(u)}
+    u.nombre=n;u.rol=rol;u.maxDesc=Math.min(100,Math.max(0,parseFloat(($("#v_d")||{}).value)||0));
+    if(p)u.h=await hsh(u.id+p);
+    saveV();
+    if(pr==="1"){SES=u.id;try{sessionStorage.setItem("sonic_ses",SES)}catch(e){}S.modo="vendedor";ov("");render()}else vend()},
+  neg(v){NG={id:v,v:""};drawNg()},
+  ngk(v){v=D(v);if(v==="c")NG.v=NG.v.slice(0,-1);else if(v==="."){if(!NG.v.includes("."))NG.v=(NG.v||"0")+"."}else if(NG.v.length<8&&!/\.\d\d$/.test(NG.v))NG.v+=v;drawNg()},
+  ngp(v){const x=items().find(i=>i.p.id==NG.id);NG.v=(Math.round(x.pl*(1-v/100)*100)/100).toFixed(2);drawNg()},
+  ngr(){delete S.neg[NG.id];ov("");render()},
+  ngok(){const x=items().find(i=>i.p.id==NG.id),val=parseFloat(NG.v);
+    if(!(val>0))return drawNg("Escribe un precio");
+    if(val>x.pl)return drawNg("No puede superar el precio de lista");
+    const min=minPrecio(x.pl);if(val<min)return drawNg("Mínimo permitido: "+money(min));
+    if(val===x.pl)delete S.neg[NG.id];else S.neg[NG.id]=val;ov("");render()},
+  lgup(){$("#flogo").click()},
+  lgdel(){LOGOTMP=null;$("#lgp").innerHTML="<span class='sm'>Sin logotipo</span>"},
+  cfgok(){const g=id=>$("#"+id).value.trim(),N=NEGOCIO;
+    N.nombre=g("c_nombre")||N.nombre;N.ruc=g("c_ruc");N.direccion=g("c_direccion");N.whatsapp=tel(g("c_whatsapp"))||N.whatsapp;N.horario=g("c_horario");N.cuentas=$("#c_cuentas").value.trim();N.nota=$("#c_nota").value.trim();N.notaNV=$("#c_nnv").value.trim();N.notaFiscal=$("#c_nfi").value.trim();
+    N.waNombre=g("c_wn")||"Ventas";N.otros=[["c_n2","c_t2"],["c_n3","c_t3"]].map(([a,b])=>({n:g(a)||"Ventas",t:tel(g(b))})).filter(o=>o.t.length>=9);
+    N.wsAlmacen=tel(g("c_wal"));N.sucursal=g("c_suc")||N.sucursal;if(g("c_pv"))N.pv=g("c_pv").replace(/\D/g,"").padStart(3,"0").slice(-3);
+    if(LOGOTMP!==undefined)N.logo=LOGOTMP||"";
+    try{localStorage.setItem("sonic_cfg",JSON.stringify(N))}catch(e){alert("No se pudo guardar (almacenamiento lleno). Prueba con un logotipo más liviano.")}
+    ov("");render()}
+};
+document.addEventListener("click",e=>{
+  if(e.target.id==="ov")ov("");
+  if(!e.target.closest("#bw"))$("#sug").style.display="none";
+  const t=e.target.closest("[data-a]");
+  if(t&&A[t.dataset.a]){if(t.closest("#sug"))$("#sug").style.display="none";A[t.dataset.a](t.dataset.v,t)}});
+document.addEventListener("input",e=>{const i=e.target.id;
+  if(i==="cn")S.cli.nombre=e.target.value;if(i==="ct")S.cli.tel=e.target.value;if(i==="cd")S.dir=e.target.value;
+  if(i==="q")sug();if(i==="hd"||i==="hh"||i==="hs"||i==="ht")histList();if(i==="st_q")stkList();if(i==="bd"&&e.target.value){S.bf=e.target.value;$("#bc").innerHTML=balHtml(S.bf)}save()});
+$("#q").addEventListener("focus",sug);
+$("#q").addEventListener("keydown",e=>{if(e.key==="Enter")A.all()});
+
+// Dictado por voz
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(!SR)$("#mic").style.display="none";
+else $("#mic").onclick=()=>{const r=new SR();r.lang="es-PE";r.onresult=e=>{$("#q").value=e.results[0][0].transcript;sug()};r.start()};
+
+/* =====================================================
+   9. IMPORTAR CSV
+   Columnas: nombre,categoria,subcategoria,marca,presentacion,precio,precioMayorista,
+   cantidadMayorista,stock,imagen,alias (separados con |),masVendido (si/true/1),sku
+   ===================================================== */
+function csv(t){const rows=[];let r=[],c="",q=false;
+  for(let i=0;i<t.length;i++){const ch=t[i];
+    if(q){if(ch=='"'){if(t[i+1]=='"'){c+='"';i++}else q=false}else c+=ch}
+    else if(ch=='"')q=true;
+    else if(ch==","||ch==";"){r.push(c);c=""}
+    else if(ch=="\n"||ch=="\r"){if(ch=="\r"&&t[i+1]=="\n")i++;r.push(c);c="";if(r.some(x=>x))rows.push(r);r=[]}
+    else c+=ch}
+  r.push(c);if(r.some(x=>x))rows.push(r);return rows}
+$("#file").onchange=e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();
+  fr.onload=()=>{const rows=csv(fr.result),h=rows.shift().map(x=>x.trim());
+    const num=["precio","precioMayorista","cantidadMayorista","stock"];
+    const arr=rows.map(r=>{const o={};h.forEach((k,i)=>{let v=(r[i]||"").trim();if(v==="")return;
+      if(num.includes(k))v=parseFloat(v.replace(",","."));else if(k==="alias")v=v.split("|");else if(k==="masVendido")v=/^(si|sí|true|1)$/i.test(v);o[k]=v});return o}).filter(o=>o.nombre&&o.precio);
+    if(!arr.length){alert("No se encontraron productos. Revisa los encabezados del CSV.");return}
+    RAW=arr;for(const k in ST)delete ST[k];try{localStorage.removeItem("sonic_stock")}catch(e){}PROD=prep(RAW);try{localStorage.setItem("catalogo",JSON.stringify(RAW))}catch(e){}
+    alert(arr.length+" productos importados");A.home()};
+  fr.readAsText(f,"UTF-8")};
+
+$("#flogo").onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image(),u=URL.createObjectURL(f);
+  im.onload=()=>{const k=Math.min(1,320/im.width,160/im.height),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+    const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);
+    LOGOTMP=c.toDataURL("image/jpeg",0.9);$("#lgp").innerHTML=`<img src="${LOGOTMP}" alt="" style="max-width:200px;max-height:80px">`;URL.revokeObjectURL(u)};
+  im.src=u;e.target.value=""};
+$("#file2").onchange=e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();
+  fr.onload=()=>{try{const a=JSON.parse(fr.result);if(!Array.isArray(a))throw 0;const have=new Set(HIST.map(d=>d.nro));let n=0,ds=0,dup=0;
+    a.forEach(d=>{if(!d||!d.nro)return;
+      if(!have.has(d.nro)){HIST.push(d);n++;   // si la venta viene de OTRO equipo, descuenta su stock aquí
+        if(d.pv&&d.pv!==NEGOCIO.pv&&!d.ref)(d.it||[]).forEach(x=>{const p=PROD.find(q=>q.sku===x.k);if(p){p.stock=Math.max(0,p.stock-x.q);ST[p.sku]=p.stock;ds++}})}
+      else{const o=HIST.find(x=>x.nro===d.nro);if(o&&(o.total!==d.total||o.fecha!==d.fecha))dup++}});HIST.sort((x,y)=>y.fecha.localeCompare(x.fecha));
+    HIST.forEach(d=>{const t=d.tp||"PF",n=parseInt(String(d.nro).split("-").pop())||0;if(!String(d.nro).startsWith(ser(t)+"-"))return;S.cnt[t]=Math.max(S.cnt[t]||1,n+1)});savePF();save();try{localStorage.setItem("sonic_stock",JSON.stringify(ST))}catch(e){}
+    alert(n+" documentos importados"+(ds?" · stock actualizado ("+ds+" líneas)":"")+(dup?"\n⚠ "+dup+" documentos NO se importaron porque su número ya existe con otros datos. Revisa que cada equipo tenga un código distinto (Personalizar recibo).":""));
+    (VOLVER==="bal"?A.bal():A.hist())}
+    catch(err){alert("El archivo no es un respaldo válido.")}};
+  fr.readAsText(f);e.target.value=""};
+
+render();
+</script>
+</body>
+</html>

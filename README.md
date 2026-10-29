@@ -1,4 +1,4 @@
-# SONIC – Catálogo y ventas para ferretería
+# SONIC – Catálogo y ventas para ferretería (versión 1.0)
 
 Aplicación web de **un solo archivo** (`index.html`): HTML + CSS + JavaScript puro, sin servidor ni librerías.
 Pensada para tablet (vendedor), celular y computadora (clientes de la tienda online). Idioma: español. Moneda: soles (S/).
@@ -47,26 +47,33 @@ El código está dividido en secciones comentadas: datos del negocio, productos 
 carrito, pantallas, acciones, importación y documentos. Las series de los documentos (`SER`) y los textos al pie
 se pueden cambiar en el código o desde el panel.
 
-## Importar productos (CSV)
-Columnas: `nombre,categoria,subcategoria,marca,presentacion,precio,precioMayorista,cantidadMayorista,stock,imagen,alias,masVendido,sku`
-(alias separados con `|`, decimales con punto, guardado en UTF-8). Las categorías nuevas aparecen solas.
+## Inventario en CSV (ver `inventario-ejemplo.csv`)
+Columnas: `nombre, categoria, subcategoria, marca, presentacion, sku, precioCompra, precio, precioMayorista, cantidadMayorista, stock, alias, masVendido, imagen`
+- Obligatorias: `nombre`, `categoria` y `precio` (precio público). Si falta `precioMayorista` se usa el 90% del público; si falta `cantidadMayorista`, 10; si falta `stock`, 20.
+- `precioCompra` es lo que te cuesta el producto: sirve para calcular la ganancia. Sin él, el producto no entra en la ganancia.
+- Precios con **punto decimal** y sin "S/" (29.50). Stock en números enteros. `alias` separados con `|`. `masVendido`: si / no.
+- Si el nombre lleva comillas de pulgadas, escríbelo entre comillas y duplica la comilla interna (mira el ejemplo del fierro).
+- Guarda como **CSV UTF-8**. Los encabezados pueden escribirse como `precio_compra`, `costo`, `precio público`, etc. (no importan mayúsculas ni tildes). Acepta archivos separados por coma o por punto y coma.
+- **Importar reemplaza el catálogo completo y el stock** por lo que trae el archivo. Antes, la app muestra un resumen con avisos (filas sin precio, mayorista mayor que el público, precio de compra mayor que el de venta, SKU repetidos).
+- El catálogo importado queda **en ese equipo**. Para que la tienda pública lo muestre, los productos deben estar en el código (`BASE`) o en un servidor.
 
-## Balance de almacén
-- Botón **📦 Balance** (barra superior en modo vendedor, y en el Panel): unidades vendidas por producto, monto, desglose por vendedor y por sucursal, y stock actual.
-- El día va de 00:00 a **23:59**. Hoy aparece como "en curso" y se puede actualizar en cualquier momento; los días anteriores quedan "cerrados". Se elige el día con el calendario.
-- Se puede imprimir (A4), enviar por WhatsApp (al número de almacén configurado) o descargar el archivo del día.
-- Roles: **Administrador** y **Almacén** ven las ventas de todos; cada **Vendedor** ve solo las suyas.
+## Resumen y ganancias (solo administrador, con PIN)
+**Panel → 📊 Resumen y ganancias** pide el PIN del administrador cada vez. Muestra ventas, ganancia real, margen, costo de lo vendido, descuentos, documentos y unidades del día elegido, un gráfico de ventas y ganancia (7 días, 30 días o 12 meses), el detalle por vendedor y los productos del día. Ganancia = precio vendido menos precio de compra (guardado al momento de la venta). Las ventas anuladas no cuentan.
 
-## Varios vendedores, tablets y sucursales
-Cada tablet guarda sus propios datos (no hay base de datos compartida). Para trabajar con varios equipos:
-1. En **Panel → Personalizar recibo y marca**, asigna a cada equipo un **código distinto** (001, 002, 003…) y su sucursal. Los números de documento llevan ese código (NV001-000001, NV002-000001…), así no se repiten entre equipos.
-2. Al cerrar el día, cada equipo descarga **⬇ Archivo del día** desde el Balance y lo envía al almacén (WhatsApp, correo, etc.).
-3. El equipo de almacén usa **📂 Importar ventas de otro equipo**. Se suman las ventas al balance y se **descuenta el stock** de esas ventas en ese equipo.
-Esto es una consolidación manual: el stock de cada tablet solo se actualiza cuando se importan los archivos de los demás equipos.
-Para stock **en tiempo real** compartido entre vendedores y sucursales hace falta una base de datos en la nube (por ejemplo Firebase, Supabase o Google Sheets).
+## Ingresar producto nuevo
+**Panel → 📦 Ajustar stock → ➕ Ingresar producto nuevo** agrega un producto al catálogo con sus precios, precio de compra (solo administrador) y stock inicial.
 
-## Ajustar stock (ingreso de mercadería)
-En **Panel → 📦 Ajustar stock** (administrador y almacén) se busca el producto y se usa **+ Sumar** para registrar un ingreso o **Fijar** para corregir el stock. Cada venta descuenta stock automáticamente en ese equipo. Importar un CSV de productos reinicia el stock.
+## Cobro, cuadre de caja y deudas
+- Al generar una nota de venta o proforma se abre **💵 Cobrar**: efectivo recibido (con **vuelto** automático), **Yape / Plin** (un solo campo), depósito / transferencia y crédito. Se pueden combinar. El botón **↳ resto** completa el saldo en el medio elegido.
+- **Panel → 💰 Cuadre de caja** (admin y vendedores; cada vendedor ve solo lo suyo): venta total del día, efectivo (ya sin vuelto), Yape + Plin, depósito, crédito, efectivo esperado en caja, lista de ventas con cliente, DNI/RUC y forma de pago, y **clientes que deben** resaltados con su deuda. Se exporta a CSV y se imprime.
+- Las ventas **a crédito** exigen nombre o DNI/RUC del cliente. Los **abonos** se registran con **💵 Abono** y entran a la caja del día en que se cobran.
+- El recibo muestra el efectivo recibido, el vuelto y cada medio de pago.
 
-## WhatsApp con varios vendedores
-En **Personalizar** se pueden registrar hasta 3 números (principal + 2). Cuando el cliente toca "Pedir por WhatsApp", elige con quién hablar o se le asigna uno al azar.
+## Nota de venta web (pedidos desde la tienda)
+El cliente arma su pedido en la tienda, escribe su nombre y celular y toca **🧾 Generar mi nota de venta**: obtiene un número (`NW-ddmmaa-nnnn`) y la envía por WhatsApp. El mensaje lleva un enlace con el pedido dentro. El vendedor abre el enlace (o pega el mensaje en **📥 Pedidos web**) y el pedido se carga en el carrito con el cliente, el tipo de precio y la entrega.
+- No usa servidor: el pedido viaja en el mensaje. Los productos se identifican por **SKU**, así que el catálogo del vendedor y el de la tienda deben tener los mismos SKU.
+- El sistema avisa si un pedido ya se vendió y marca cada pedido como pendiente, cargado o vendido.
+
+## Reportes en Excel con vista previa
+Cuadre de caja, ventas y documentos, balance de almacén y resumen de ganancias tienen el botón **👁 Vista previa**. Desde ahí se ve el reporte tal como saldrá y se elige **⬇ Descargar Excel (.xlsx)**, **🖨 Imprimir** (A4 horizontal) o CSV.
+El Excel es un archivo real con varias hojas, banner azul con tu logo y título, encabezados celestes, filas con borde, totales y filas resaltadas para las ventas a crédito. Las columnas siguen este orden: serie, número, tipo, sucursal, cliente doc, cliente nombre, fecha de emisión, fecha de creación, forma de pago, efectivo, Yape, Plin, depósito, crédito, total, estado y usuario.
